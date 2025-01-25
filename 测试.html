@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高级个人空间</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+    <style>
+        :root {
+            --primary-color: #fff0f5;
+            --accent-color: #ff69b4;
+            --text-color: #333;
+            --transition-speed: 0.4s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(45deg, #fff, var(--primary-color));
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            transition: transform 0.3s;
+        }
+
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            transform: translateX(-100%);
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .logo {
+            padding: 2rem;
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 1.5rem;
+        }
+
+        .nav-links li {
+            padding: 1.2rem;
+            margin: 0.8rem 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links li::before {
+            content: '';
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-color);
+            transition: left 0.6s ease;
+            z-index: -1;
+        }
+
+        .nav-links li:hover::before {
+            left: 0;
+        }
+
+        .nav-links li:hover {
+            color: white;
+            transform: translateX(15px);
+        }
+
+        .nav-links li.active {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255,105,180,0.3);
+        }
+
+        main {
+            margin-left: 0;
+            padding: 2rem;
+            transition: margin-left var(--transition-speed);
+        }
+
+        .content {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+            position: absolute;
+            width: calc(100% - 4rem);
+        }
+
+        .content.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            main {
+                padding: 1rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            main {
+                margin-left: 250px;
+            }
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+
+        /* 首页样式 */
+        #home {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-container {
+            text-align: center;
+            padding: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .avatar-wrapper {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 3rem;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s;
+        }
+
+        .avatar:hover {
+            transform: rotateY(180deg);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin: 2rem 0;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .social-links a {
+            font-size: 2rem;
+            color: var(--accent-color);
+            transition: transform 0.3s;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 文章区 */
+        .article-list {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .article-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 画册区 */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* 碎碎念区 */
+        .moment-list {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .moment-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .moment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+
+    <nav class="sidebar">
+        <div class="logo">Creative Space</div>
+        <ul class="nav-links">
+            <li data-target="home" class="active"><i class="fas fa-home"></i>首页</li>
+            <li data-target="articles"><i class="fas fa-book-open"></i>文章</li>
+            <li data-target="gallery"><i class="fas fa-camera-retro"></i>画册</li>
+            <li data-target="moments"><i class="fas fa-comment-dots"></i>碎碎念</li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- 首页 -->
+        <section id="home" class="content active">
+            <div class="hero-container">
+                <div class="avatar-wrapper">
+                    <img src="images/avatar.jpg" alt="头像" class="avatar">
+                </div>
+                <h1>创意空间</h1>
+                <p class="intro">设计 | 摄影 | 生活美学</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 文章区 -->
+        <section id="articles" class="content">
+            <div class="article-list">
+                <article class="article-card">
+                    <h2>设计思维方法论</h2>
+                    <p class="meta">2023-10-01 | 阅读量 1520</p>
+                    <p>探索如何将设计思维应用于日常生活...</p>
+                    <a href="articles/design-thinking.html" class="read-more">阅读全文 →</a>
+                </article>
+                <article class="article-card">
+                    <h2>色彩搭配指南</h2>
+                    <p class="meta">2023-09-25 | 阅读量 2345</p>
+                    <p>掌握基础色彩理论，打造视觉盛宴...</p>
+                    <a href="articles/color-guide.html" class="read-more">阅读全文 →</a>
+                </article>
+            </div>
+        </section>
+
+        <!-- 画册区 -->
+        <section id="gallery" class="content">
+            <div class="gallery-grid">
+                <a href="images/gallery/1.jpg" data-lightbox="gallery" class="gallery-item">
+                    <img src="images/gallery/1-thumb.jpg" alt="自然风光">
+                </a>
+                <a href="images/gallery/2.jpg" data-lightbox="gallery" class="gallery-item">
+                    <img src="images/gallery/2-thumb.jpg" alt="城市夜景">
+                </a>
+                <a href="images/gallery/3.jpg" data-lightbox="gallery" class="gallery-item">
+                    <img src="images/gallery/3-thumb.jpg" alt="抽象艺术">
+                </a>
+            </div>
+        </section>
+
+        <!-- 碎碎念区 -->
+        <section id="moments" class="content">
+            <div class="moment-list">
+                <div class="moment-card">
+                    <div class="moment-header">
+                        <span>2023-10-05 ☁️</span>
+                        <span>#生活碎片</span>
+                    </div>
+                    <p>在咖啡馆发现一本绝版设计杂志，真是今日小确幸！</p>
+                </div>
+                <div class="moment-card">
+                    <div class="moment-header">
+                        <span>2023-10-03 🌟</span>
+                        <span>#创作灵感</span>
+                    </div>
+                    <p>新的配色方案终于调试成功，渐变色叠加微质感效果太棒了！</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // 粒子背景初始化
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80 },
+                color: { value: '#ff69b4' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5 },
+                size: { value: 3 },
+                move: { speed: 2 }
+            },
+            interactivity: {
+                events: {
+                    onhover: { enable: true, mode: 'repulse' },
+                    onclick: { enable: true, mode: 'push' }
+                }
+            }
+        });
+
+        // 侧边栏交互
+        document.querySelector('.menu-toggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-links li').forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有激活状态
+                document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                
+                // 设置当前激活状态
+                this.classList.add('active');
+                document.getElementById(this.dataset.target).classList.add('active');
+                
+                // 移动端自动关闭侧边栏
+                if(window.innerWidth <= 768) {
+                    document.querySelector('.sidebar').classList.remove('active');
+                }
+            });
+        });
+
+        // 点击内容区域关闭侧边栏（移动端）
+        document.querySelector('main').addEventListener('click', () => {
+            if(window.innerWidth <= 768) {
+                document.querySelector('.sidebar').classList.remove('active');
+            }
+        });
+
+        // Lightbox初始化
+        lightbox.option({
+            'resizeDuration': 300,
+            'wrapAround': true,
+            'albumLabel': "图片 %1 / %2"
+        });
+
+        // 页面加载后初始化首页
+        window.addEventListener('load', () => {
+            document.querySelector('.nav-links li[data-target="home"]').click();
+        });
+    </script>
+</body>
+</html>
